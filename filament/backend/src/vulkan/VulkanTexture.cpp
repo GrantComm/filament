@@ -70,7 +70,6 @@ VulkanTexture::VulkanTexture(VkDevice device, VkPhysicalDevice physicalDevice,
       mCommands(commands),
       mLayerCount(depth)
       {
-    std::cout << "HERE, CREATE IMAGE" << std::endl;
     // Create an appropriately-sized device-only VkImage, but do not fill it yet.
     VkImageCreateInfo imageInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
             .imageType = target == SamplerType::SAMPLER_3D ? VK_IMAGE_TYPE_3D : VK_IMAGE_TYPE_2D,
@@ -84,15 +83,11 @@ VulkanTexture::VulkanTexture(VkDevice device, VkPhysicalDevice physicalDevice,
             #endif
             .tiling = VK_IMAGE_TILING_OPTIMAL,
             .usage = 0};
-    std::cout << "HERE, CREATE IMAGE INFO layerCount: " << mLayerCount << std::endl;
     if (target == SamplerType::SAMPLER_CUBEMAP) {
-        std::cout << "HERE, SAMPLER_CUBEMAP" << std::endl;
         imageInfo.arrayLayers = 6;
         imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     }
     if (target == SamplerType::SAMPLER_2D_ARRAY) {
-        std::cout << "HERE, SAMPLER_2D_ARRAY" << std::endl;
-        std::cout << "HERE, depth: " << depth << std::endl;
         imageInfo.arrayLayers = depth;
         imageInfo.extent.depth = 1;
         // NOTE: We do not use VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT here because:
@@ -104,12 +99,10 @@ VulkanTexture::VulkanTexture(VkDevice device, VkPhysicalDevice physicalDevice,
         // not the VkImage.
     }
     if (target == SamplerType::SAMPLER_CUBEMAP_ARRAY) {
-        std::cout << "HERE, SAMPLER_CUBEMAP_ARRAY" << std::endl;
         imageInfo.arrayLayers = depth * 6;
         imageInfo.extent.depth = 1;
     }
     if (target == SamplerType::SAMPLER_3D) {
-        std::cout << "HERE, SAMPLER_3D" << std::endl;
         imageInfo.arrayLayers = 1;
     }
 

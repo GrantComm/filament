@@ -137,6 +137,14 @@ public:
         return mMultiviewEnabled;
     }
 
+    inline bool isMultiviewEnabled() const noexcept {
+        return mMultiviewEnabled;
+    }
+
+    inline void setMultiviewEnabled(bool isEnabled) noexcept {
+        mMultiviewEnabled = isEnabled;
+    }
+
     inline bool isClipDistanceSupported() const noexcept {
         return mPhysicalDeviceFeatures.shaderClipDistance == VK_TRUE;
     }
