@@ -16,10 +16,12 @@
 
 #include "vulkan/VulkanFboCache.h"
 
+#include <cstdint>
 #include <utils/Panic.h>
 
 #include "VulkanConstants.h"
 #include "VulkanUtility.h"
+#include <iostream>
 
 // If any VkRenderPass or VkFramebuffer is unused for more than TIME_BEFORE_EVICTION frames, it
 // is evicted from the cache.
@@ -122,11 +124,14 @@ VkFramebuffer VulkanFboCache::getFramebuffer(FboKey config) noexcept {
 }
 
 VkRenderPass VulkanFboCache::getRenderPass(RenderPassKey config) noexcept {
+    std::cout << "Get renderpass called" << std::endl;
     auto iter = mRenderPassCache.find(config);
     if (UTILS_LIKELY(iter != mRenderPassCache.end() && iter->second.handle != VK_NULL_HANDLE)) {
+            std::cout << "Found config in cache" << std::endl;
         iter.value().timestamp = mCurrentTime;
         return iter->second.handle;
     }
+    std::cout << "Ok" << std::endl;
     const bool hasSubpasses = config.subpassMask != 0;
 
     // Set up some const aliases for terseness.
@@ -167,37 +172,6 @@ VkRenderPass VulkanFboCache::getRenderPass(RenderPassKey config) noexcept {
     VkAttachmentDescription attachments[MRT::MAX_SUPPORTED_RENDER_TARGET_COUNT + MRT::MAX_SUPPORTED_RENDER_TARGET_COUNT + 1] = {};
 
     // We support 2 subpasses, which means we need to supply 3 dependency structs in multiview and 1 without multiview.
-    #ifdef FILAMENT_ENABLE_MULTIVIEW
-    VkSubpassDependency dependencies[3] = {
-        {
-            .srcSubpass = VK_SUBPASS_EXTERNAL,
-            .dstSubpass = 0,
-            .srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-            .dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-            .srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-            .dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-            .dependencyFlags = 0,
-        },
-        {
-            .srcSubpass = VK_SUBPASS_EXTERNAL,
-            .dstSubpass = 0,
-            .srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            .srcAccessMask = 0,
-            .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-            .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
-        },
-        {
-        .srcSubpass = 0,
-        .dstSubpass = 1,
-        .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-        .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-        .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
-        .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
-        }
-    };
-    #else
     VkSubpassDependency dependencies[1] = {{
         .srcSubpass = 0,
         .dstSubpass = 1,
@@ -207,12 +181,12 @@ VkRenderPass VulkanFboCache::getRenderPass(RenderPassKey config) noexcept {
         .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
         .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
     }};
-    #endif
 
     void *pNext_for_renderPass = NULL;
     VkRenderPassMultiviewCreateInfo multiviewCreateInfo = {};
     
     if (config.viewCount > 1) {
+        std::cout << "ENABLED" << std::endl;
       // Enable all the views.
       uint32_t subpass_view_mask = (1 << config.viewCount) - 1;
 
@@ -239,11 +213,7 @@ VkRenderPass VulkanFboCache::getRenderPass(RenderPassKey config) noexcept {
         .pAttachments = attachments,
         .subpassCount = hasSubpasses ? 2u : 1u,
         .pSubpasses = subpasses,
-        #ifdef FILAMENT_ENABLE_MULTIVIEW
-        .dependencyCount = hasSubpasses ? 3u : 2u,
-        #else
         .dependencyCount = hasSubpasses ? 1u : 0u,
-        #endif
         .pDependencies = dependencies,
     };
 

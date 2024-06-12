@@ -20,8 +20,12 @@
 
 #include <DataReshaper.h>
 #include <backend/DriverEnums.h>
+#include <cstdint>
+#include <cstdio>
+#include <ios>
 #include <private/backend/BackendUtils.h>
 
+#include <string>
 #include <utils/Panic.h>
 #include <iostream>
 
@@ -76,11 +80,7 @@ VulkanTexture::VulkanTexture(VkDevice device, VkPhysicalDevice physicalDevice,
             .format = mVkFormat,
             .extent = {w, h, depth},
             .mipLevels = levels,
-            #ifdef FILAMENT_ENABLE_MULTIVIEW
-            .arrayLayers = 2,
-            #else
             .arrayLayers = 1,
-            #endif
             .tiling = VK_IMAGE_TILING_OPTIMAL,
             .usage = 0};
     if (target == SamplerType::SAMPLER_CUBEMAP) {
@@ -101,9 +101,6 @@ VulkanTexture::VulkanTexture(VkDevice device, VkPhysicalDevice physicalDevice,
     if (target == SamplerType::SAMPLER_CUBEMAP_ARRAY) {
         imageInfo.arrayLayers = depth * 6;
         imageInfo.extent.depth = 1;
-    }
-    if (target == SamplerType::SAMPLER_3D) {
-        imageInfo.arrayLayers = 1;
     }
 
     mLayerCount = imageInfo.arrayLayers;
@@ -429,7 +426,9 @@ VkImageView VulkanTexture::getImageView(VkImageSubresourceRange range, VkImageVi
         .subresourceRange = range,
     };
     VkImageView imageView;
+    std::cout<< "Here0" << std::endl;
     vkCreateImageView(mDevice, &viewInfo, VKALLOC, &imageView);
+    std::cout<< "Here1" << std::endl;
     mCachedImageViews.emplace(key, imageView);
     return imageView;
 }

@@ -26,6 +26,7 @@
 #include "VulkanTexture.h"
 #include "VulkanUtility.h"
 
+#include <cstdint>
 #include <private/backend/SamplerGroup.h>
 #include <backend/Program.h>
 
@@ -322,6 +323,8 @@ struct VulkanRenderTarget : private HwRenderTarget, VulkanResource {
     bool hasDepth() const { return mDepth.texture; }
     bool isSwapChain() const { return !mOffscreen; }
     void bindToSwapChain(VulkanSwapChain& surf);
+    void setLayerCount(uint8_t layerCount) {mLayerCount = layerCount;}
+    uint8_t getLayerCount() {return mLayerCount;}
 
 private:
     VulkanAttachment mColor[MRT::MAX_SUPPORTED_RENDER_TARGET_COUNT] = {};
@@ -330,6 +333,7 @@ private:
     VulkanAttachment mMsaaDepthAttachment = {};
     const bool mOffscreen : 1;
     uint8_t mSamples : 7;
+    uint8_t mLayerCount = 0;
 };
 
 struct VulkanBufferObject;

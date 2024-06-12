@@ -19,6 +19,7 @@
 
 #include "VulkanContext.h"
 
+#include <cstdint>
 #include <utils/Hash.h>
 
 #include <backend/TargetBufferInfo.h>
