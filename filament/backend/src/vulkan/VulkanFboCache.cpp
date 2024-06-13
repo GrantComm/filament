@@ -124,14 +124,11 @@ VkFramebuffer VulkanFboCache::getFramebuffer(FboKey config) noexcept {
 }
 
 VkRenderPass VulkanFboCache::getRenderPass(RenderPassKey config) noexcept {
-    std::cout << "Get renderpass called" << std::endl;
     auto iter = mRenderPassCache.find(config);
     if (UTILS_LIKELY(iter != mRenderPassCache.end() && iter->second.handle != VK_NULL_HANDLE)) {
-            std::cout << "Found config in cache" << std::endl;
         iter.value().timestamp = mCurrentTime;
         return iter->second.handle;
     }
-    std::cout << "Ok" << std::endl;
     const bool hasSubpasses = config.subpassMask != 0;
 
     // Set up some const aliases for terseness.
@@ -186,7 +183,6 @@ VkRenderPass VulkanFboCache::getRenderPass(RenderPassKey config) noexcept {
     VkRenderPassMultiviewCreateInfo multiviewCreateInfo = {};
     
     if (config.viewCount > 1) {
-        std::cout << "ENABLED" << std::endl;
       // Enable all the views.
       uint32_t subpass_view_mask = (1 << config.viewCount) - 1;
 

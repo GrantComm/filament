@@ -536,9 +536,6 @@ void VulkanDriver::createTextureR(Handle<HwTexture> th, SamplerType target, uint
             mPlatform->getPhysicalDevice(), mContext, mAllocator, &mCommands, target, levels,
             format, samples, w, h, depth, usage, mStagePool);
     mResourceManager.acquire(vktexture);
-    if (target == SamplerType::SAMPLER_2D_ARRAY && depth > 1) {
-        mStereoAttachments.push_back(vktexture);        
-    }
 }
 
 void VulkanDriver::createTextureSwizzledR(Handle<HwTexture> th, SamplerType target, uint8_t levels,
@@ -651,7 +648,6 @@ void VulkanDriver::createRenderTargetR(Handle<HwRenderTarget> rth,
             samples, colorTargets, depthStencil, mStagePool);
     renderTarget->setLayerCount(layerCount);
     mResourceManager.acquire(renderTarget);
-    std::cout << "Layer Count: " << std::to_string(layerCount) << std::endl;
 }
 
 void VulkanDriver::destroyRenderTarget(Handle<HwRenderTarget> rth) {
@@ -1293,18 +1289,10 @@ void VulkanDriver::beginRenderPass(Handle<HwRenderTarget> rth, const RenderPassP
         .viewCount = 1
     };
 
-
-    /*if (depth.texture && rpkey.viewCount > 1) {
-        depth.texture->transitionLayout(cmdbuffer, depth.getSubresourceRange(), VulkanLayout::DEPTH_ATTACHMENT);
-    }*/
     for (int i = 0; i < MRT::MAX_SUPPORTED_RENDER_TARGET_COUNT; i++) {
         const VulkanAttachment& info = rt->getColor(i);
-        
         if (info.texture) {
-            const auto &iter = std::find(mStereoAttachments.begin(), mStereoAttachments.end(), info.texture);
-            if (iter != mStereoAttachments.end()) {
-                rpkey.viewCount = rt->getLayerCount();
-            }
+            rpkey.viewCount = info.texture->getLayerCount();
             rpkey.initialColorLayoutMask |= 1 << i;
             rpkey.colorFormat[i] = info.getFormat();
             if (rpkey.samples > 1 && info.texture->samples == 1) {

@@ -17,8 +17,6 @@
 #ifndef TNT_FILAMENT_BACKEND_VULKANDRIVER_H
 #define TNT_FILAMENT_BACKEND_VULKANDRIVER_H
 
-#include <list>
-
 #include "VulkanBlitter.h"
 #include "VulkanConstants.h"
 #include "VulkanContext.h"
@@ -175,7 +173,6 @@ private:
 
     bool const mIsSRGBSwapChainSupported;
     backend::StereoscopicType const mStereoscopicType;
-    std::list<VulkanTexture*> mStereoAttachments;
 };
 
 } // namespace filament::backend

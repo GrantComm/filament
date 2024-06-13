@@ -426,9 +426,7 @@ VkImageView VulkanTexture::getImageView(VkImageSubresourceRange range, VkImageVi
         .subresourceRange = range,
     };
     VkImageView imageView;
-    std::cout<< "Here0" << std::endl;
     vkCreateImageView(mDevice, &viewInfo, VKALLOC, &imageView);
-    std::cout<< "Here1" << std::endl;
     mCachedImageViews.emplace(key, imageView);
     return imageView;
 }
