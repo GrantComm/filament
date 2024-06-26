@@ -32,6 +32,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "vulkan/VulkanContext.h"
+
 namespace filament::backend {
 
 using SwapChain = Platform::SwapChain;
@@ -266,6 +268,12 @@ public:
      * @return The queue that was selected for the Vulkan backend.
      */
     VkQueue getGraphicsQueue() const noexcept;
+
+    /**
+     * @return The context that was created during the initialization of the
+     * driver.
+     */
+    VulkanContext getContext() const noexcept;
 
 private:
     static ExtensionSet getSwapchainInstanceExtensions();

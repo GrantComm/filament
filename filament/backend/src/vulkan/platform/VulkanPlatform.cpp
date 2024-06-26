@@ -847,6 +847,10 @@ VkQueue VulkanPlatform::getGraphicsQueue() const noexcept {
     return mImpl->mGraphicsQueue;
 }
 
+VulkanContext VulkanPlatform::getContext() const noexcept {
+  return mImpl->mContext;
+}
+
 #undef SWAPCHAIN_RET_FUNC
 
 }// namespace filament::backend
