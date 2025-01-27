@@ -24,6 +24,7 @@
 #include "vulkan/memory/Resource.h"
 #include "vulkan/memory/ResourcePointer.h"
 
+#include <cstdint>
 #include <utils/Hash.h>
 #include <utils/RangeMap.h>
 
@@ -94,7 +95,7 @@ struct VulkanTexture : public HwTexture, fvkmemory::Resource {
     // The texture will never destroy the given VkImage, but it does manages its subresources.
     VulkanTexture(VkDevice device, VmaAllocator allocator,
             fvkmemory::ResourceManager* resourceManager, VulkanCommands* commands, VkImage image,
-            VkDeviceMemory memory, VkFormat format, uint8_t samples, uint32_t width, uint32_t height,
+            VkDeviceMemory memory, VkFormat format, uint8_t samples, uint32_t width, uint32_t height, uint8_t layerCount,
             TextureUsage tusage, VulkanStagePool& stagePool);
 
     // Constructor for creating a texture view for wrt specific mip range
